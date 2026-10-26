@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aether-Cloud Monitoring</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,400,0..1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f9fa;--surface:#fff;--surface2:#f1f3f4;--line:#dadce0;--text:#202124;--muted:#5f6368;--primary:#1a73e8;--primary-c:#e8f0fe;--ok:#1e8e3e;--warn:#f9ab00;--crit:#d93025;--shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);--ease:cubic-bezier(.2,0,0,1)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f1f1f;--surface:#28292a;--surface2:#303134;--line:#3c4043;--text:#e8eaed;--muted:#9aa0a6;--primary:#8ab4f8;--primary-c:#1e3a5f;--ok:#81c995;--warn:#fdd663;--crit:#f28b82;--shadow:0 1px 3px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#1f1f1f;--surface:#28292a;--surface2:#303134;--line:#3c4043;--text:#e8eaed;--muted:#9aa0a6;--primary:#8ab4f8;--primary-c:#1e3a5f;--ok:#81c995;--warn:#fdd663;--crit:#f28b82;--shadow:0 1px 3px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 Roboto,system-ui,sans-serif;background:var(--bg);color:var(--text);transition:background .3s var(--ease),color .3s var(--ease)}
+.ms{font-family:'Material Symbols Outlined';font-size:20px;vertical-align:middle;line-height:1}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:500}
+.logo b{color:var(--primary)}
+.proj{display:flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--text);background:none;font:inherit}
+.search{flex:1;max-width:560px;display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:8px 12px;color:var(--muted)}
+.search input{border:0;background:none;outline:0;flex:1;color:var(--text);font:inherit;min-width:0}
+.icon-btn{border:0;background:none;color:var(--muted);width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;flex:none}
+.icon-btn:hover{background:var(--surface2)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:var(--surface);display:grid;place-items:center;font-weight:500;flex:none}
+.layout{display:flex}
+nav{width:240px;flex:none;padding:8px;height:calc(100vh - 56px);position:sticky;top:56px;overflow:auto;background:var(--surface);border-right:1px solid var(--line)}
+nav a{display:flex;align-items:center;gap:14px;padding:9px 14px;border-radius:0 20px 20px 0;color:var(--text);text-decoration:none;margin-left:-8px;transition:background .2s}
+nav a:hover{background:var(--surface2)}
+nav a.on{background:var(--primary-c);color:var(--primary);font-weight:500}
+nav h6{margin:16px 6px 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+main{flex:1;min-width:0;padding:20px 24px 40px}
+.title{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.title h1{font-size:22px;font-weight:400;margin:0;flex:1}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;transition:all .2s var(--ease)}
+.chip.on{background:var(--primary-c);border-color:transparent;color:var(--primary)}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--ok);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;position:relative}
+.live .dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:currentColor;animation:pulse 1.6s var(--ease) infinite}
+@keyframes pulse{to{transform:scale(2.8);opacity:0}}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;grid-column:span 12;animation:in .5s var(--ease) both}
+.card:hover{box-shadow:var(--shadow)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.card h2{margin:0 0 12px;font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px}
+.card h2 small{margin-left:auto;color:var(--muted);font-weight:400}
+.kpi{grid-column:span 3}
+.kpi .v{font-size:30px;font-variant-numeric:tabular-nums;transition:color .6s}
+.kpi .l{color:var(--muted)}
+.kpi .d{font-size:12px}
+.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}
+svg text{fill:var(--muted);font-size:10px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+#topo .link{stroke:var(--line);stroke-width:2;fill:none}
+#topo .flow{stroke:var(--primary);stroke-width:2;fill:none;stroke-dasharray:4 10;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-14}}
+#topo .node{cursor:pointer;transition:transform .25s var(--ease);transform-box:fill-box;transform-origin:center}
+#topo .node:hover{transform:scale(1.12)}
+#topo .node circle{stroke:var(--surface);stroke-width:3}
+#topo .node text{fill:var(--text);font-size:11px;text-anchor:middle}
+.heat{display:grid;grid-template-columns:70px repeat(24,1fr);gap:2px;font-size:10px;color:var(--muted)}
+.heat div.c{aspect-ratio:1;border-radius:3px;cursor:pointer;transition:transform .15s var(--ease)}
+.heat div.c:hover{transform:scale(1.35);outline:2px solid var(--text)}
+.heat span{align-self:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:500;font-size:12px}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--surface2);cursor:pointer}
+.st{display:inline-flex;align-items:center;gap:6px}
+.bar{height:6px;border-radius:3px;background:var(--surface2);width:90px;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:3px;transition:width .8s var(--ease),background .8s}
+.tbl{overflow-x:auto}
+.alert{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.alert:last-child{border:0}
+.alert .t{color:var(--muted);font-size:12px}
+#tip{position:fixed;pointer-events:none;background:var(--text);color:var(--bg);padding:6px 10px;border-radius:6px;font-size:12px;opacity:0;transition:opacity .15s;z-index:20}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--surface);box-shadow:-4px 0 16px rgba(0,0,0,.2);transform:translateX(100%);transition:transform .35s var(--ease);z-index:30;padding:20px;overflow:auto}
+.drawer.open{transform:none}
+.drawer h3{margin:0 0 4px;font-weight:400;font-size:20px}
+@media (max-width:1100px){.kpi{grid-column:span 6}.span8,.span4,.span6{grid-column:span 12}}
+@media (max-width:760px){nav{display:none}main{padding:16px}.kpi{grid-column:span 12}.search,.proj span.n{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <button class="icon-btn" aria-label="Menü"><span class="ms">menu</span></button>
+  <div class="logo"><span class="ms" style="color:var(--primary)">cloud</span><span>Aether<b>Cloud</b></span></div>
+  <button class="proj"><span class="ms">hub</span><span class="n">prod-global-01</span><span class="ms">arrow_drop_down</span></button>
+  <div class="search"><span class="ms">search</span><input placeholder="Ressourcen, Metriken, Logs suchen (/)"></div>
+  <button class="icon-btn" id="theme" aria-label="Theme"><span class="ms">dark_mode</span></button>
+  <button class="icon-btn" aria-label="Benachrichtigungen"><span class="ms">notifications</span></button>
+  <div class="avatar">V</div>
+</header>
+<div class="layout">
+<nav>
+  <a class="on" href="#"><span class="ms">dashboard</span>Übersicht</a>
+  <a href="#"><span class="ms">monitoring</span>Metriken-Explorer</a>
+  <a href="#"><span class="ms">lan</span>Topologie</a>
+  <a href="#"><span class="ms">notes</span>Logs</a>
+  <a href="#"><span class="ms">timeline</span>Traces</a>
+  <h6>Ressourcen</h6>
+  <a href="#"><span class="ms">deployed_code</span>Kubernetes-Cluster</a>
+  <a href="#"><span class="ms">bolt</span>Serverless-Dienste</a>
+  <a href="#"><span class="ms">database</span>Datenbanken</a>
+  <a href="#"><span class="ms">memory</span>Cache</a>
+  <h6>Betrieb</h6>
+  <a href="#"><span class="ms">notifications_active</span>Alerts</a>
+  <a href="#"><span class="ms">verified</span>SLOs</a>
+  <a href="#"><span class="ms">settings</span>Einstellungen</a>
+</nav>
+<main>
+  <div class="title">
+    <h1>Übersicht</h1>
+    <span class="live"><span class="dot"></span>Live</span>
+    <div class="chips" id="regions"></div>
+  </div>
+  <div class="grid">
+    <div class="card kpi"><div class="l">Ø CPU-Auslastung</div><div class="v" id="k-cpu">–</div><div class="d" id="k-cpu-d"></div></div>
+    <div class="card kpi"><div class="l">Anfragen / s</div><div class="v" id="k-rps">–</div><div class="d" style="color:var(--ok)">▲ 4,2 % ggü. gestern</div></div>
+    <div class="card kpi"><div class="l">p99-Latenz</div><div class="v" id="k-lat">–</div><div class="d" style="color:var(--muted)">SLO: &lt; 250 ms</div></div>
+    <div class="card kpi"><div class="l">Aktive Alerts</div><div class="v" id="k-al" style="color:var(--crit)">3</div><div class="d" style="color:var(--muted)">1 kritisch · 2 Warnung</div></div>
+
+    <div class="card span8"><h2><span class="ms">show_chart</span>CPU &amp; Speicher<small id="chart-reg"></small></h2>
+      <svg id="chart" viewBox="0 0 600 200" width="100%" preserveAspectRatio="none" style="height:220px"></svg>
+      <div class="legend"><span><i style="background:var(--primary)"></i>CPU %</span><span><i style="background:var(--ok)"></i>Speicher %</span></div>
+    </div>
+    <div class="card span4"><h2><span class="ms">notifications_active</span>Aktuelle Alerts</h2><div id="alerts"></div></div>
+
+    <div class="card span6"><h2><span class="ms">lan</span>Globale Topologie<small>Echtzeit-Datenfluss</small></h2>
+      <svg id="topo" viewBox="0 0 500 280" width="100%"></svg></div>
+    <div class="card span6"><h2><span class="ms">grid_on</span>CPU-Heatmap · 24 h<small>Klick für Details</small></h2>
+      <div class="heat" id="heat"></div></div>
+
+    <div class="card"><h2><span class="ms">dns</span>Instanzen<small id="cnt"></small></h2>
+      <div class="tbl"><table><thead><tr><th>Status</th><th>Name</th><th>Region</th><th>Typ</th><th>CPU</th><th>Speicher</th><th>Netzwerk</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </div>
+  </div>
+</main>
+</div>
+<div id="tip"></div>
+<aside class="drawer" id="drawer"><button class="icon-btn" style="float:right" onclick="drawer.classList.remove('open')"><span class="ms">close</span></button><div id="dbody"></div></aside>
+<script>
+const $=s=>document.querySelector(s), R=(a,b)=>a+Math.random()*(b-a);
+const regions=['Alle','europe-west3','us-central1','asia-east1'];
+let region='Alle';
+const types=['gke-node','cloud-run','spanner','redis','vm-n2'];
+const inst=Array.from({length:14},(_,i)=>({name:`${types[i%5]}-${(1000+i*37).toString(36)}`,region:regions[1+i%3],type:types[i%5],cpu:R(10,95),mem:R(20,90),net:R(5,900)}));
+const color=v=>v>85?'var(--crit)':v>65?'var(--warn)':'var(--ok)';
+const label=v=>v>85?'Kritisch':v>65?'Warnung':'OK';
+const tip=$('#tip');
+function showTip(e,t){tip.textContent=t;tip.style.opacity=1;tip.style.left=e.clientX+12+'px';tip.style.top=e.clientY+12+'px'}
+document.addEventListener('mouseout',e=>{if(e.target.closest('[data-tip]'))tip.style.opacity=0});
+document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(t)showTip(e,t.dataset.tip)});
+
+$('#regions').innerHTML=regions.map(r=>`<button class="chip${r===region?' on':''}">${r}</button>`).join('');
+$('#regions').onclick=e=>{if(e.target.tagName!=='BUTTON')return;region=e.target.textContent;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===e.target));renderAll(true)};
+$('#theme').onclick=()=>{const d=document.documentElement,dark=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;d.dataset.theme=dark?'light':'dark'};
+
+const visible=()=>inst.filter(i=>region==='Alle'||i.region===region);
+
+// Zeitreihe
+const walk=(v,d)=>Array.from({length:60},()=>v+=R(-d,d));
+let series={cpu:walk(48,3),mem:walk(58,1)};
+function path(a){return a.map((v,i)=>`${i?'L':'M'}${(i/(a.length-1)*600).toFixed(1)},${(190-v*1.8).toFixed(1)}`).join('')}
+function drawChart(){
+  const grid=[0,25,50,75,100].map(v=>`<line x1="0" x2="600" y1="${190-v*1.8}" y2="${190-v*1.8}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="2" y="${186-v*1.8}">${v}%</text>`).join('');
+  $('#chart').innerHTML=grid+
+  `<path d="${path(series.cpu)}L600,190L0,190Z" fill="var(--primary)" opacity=".08"/>
+   <path d="${path(series.cpu)}" stroke="var(--primary)" stroke-width="2" fill="none" vector-effect="non-scaling-stroke"/>
+   <path d="${path(series.mem)}" stroke="var(--ok)" stroke-width="2" fill="none" vector-effect="non-scaling-stroke"/>
+   <line id="cross" y1="0" y2="190" stroke="var(--muted)" opacity="0"/>`;
+  $('#chart-reg').textContent=region;
+}
+$('#chart').onmousemove=e=>{const r=e.currentTarget.getBoundingClientRect(),i=Math.round((e.clientX-r.left)/r.width*59),x=i/59*600,c=$('#cross');c.setAttribute('x1',x);c.setAttribute('x2',x);c.setAttribute('opacity',1);showTip(e,`vor ${59-i} s · CPU ${series.cpu[i].toFixed(1)} % · RAM ${series.mem[i].toFixed(1)} %`)};
+$('#chart').onmouseleave=()=>{tip.style.opacity=0;$('#cross')?.setAttribute('opacity',0)};
+
+// Topologie
+const nodes=[{id:'LB',x:250,y:40,r:20,ic:'Global LB'},{id:'eu',x:90,y:140,r:24,ic:'europe-west3'},{id:'us',x:250,y:150,r:24,ic:'us-central1'},{id:'as',x:410,y:140,r:24,ic:'asia-east1'},{id:'sp',x:170,y:245,r:18,ic:'Spanner'},{id:'rd',x:330,y:245,r:18,ic:'Redis'}];
+const links=[['LB','eu'],['LB','us'],['LB','as'],['eu','sp'],['us','sp'],['us','rd'],['as','rd'],['eu','us'],['us','as']];
+function drawTopo(){
+  const N=Object.fromEntries(nodes.map(n=>[n.id,n]));
+  const load={eu:R(30,90),us:R(30,90),as:R(30,90),LB:R(20,50),sp:R(20,70),rd:R(20,70)};
+  $('#topo').innerHTML=links.map(([a,b])=>{const d=`M${N[a].x},${N[a].y}Q${(N[a].x+N[b].x)/2},${(N[a].y+N[b].y)/2-20} ${N[b].x},${N[b].y}`;return `<path class="link" d="${d}"/><path class="flow" d="${d}" style="animation-duration:${R(.6,1.8).toFixed(2)}s"/>`}).join('')+
+  nodes.map(n=>`<g class="node" data-tip="${n.ic} · Last ${load[n.id].toFixed(0)} %"><circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${color(load[n.id])}" style="transition:fill .8s"/><text x="${n.x}" y="${n.y+n.r+14}">${n.ic}</text></g>`).join('');
+}
+
+// Heatmap
+const heatColor=v=>{const h=v<50?140-v*.8:v<80?100-(v-50)*1.8:46-(v-80)*2.3;return `hsl(${h} 70% ${48+(1-v/100)*14}%)`};
+function drawHeat(){
+  const list=visible().slice(0,8);
+  $('#heat').innerHTML='<span></span>'+Array.from({length:24},(_,h)=>`<span style="text-align:center">${h%6?'':h}</span>`).join('')+
+  list.map(i=>`<span title="${i.name}">${i.name}</span>`+Array.from({length:24},(_,h)=>{const v=Math.min(99,Math.max(3,i.cpu*.6+30*Math.sin((h+i.name.length)/3.5)+R(-10,10)));return `<div class="c" style="background:${heatColor(v)}" data-tip="${i.name} · ${h}:00 · ${v.toFixed(0)} %" data-n="${i.name}"></div>`}).join('')).join('');
+}
+$('#heat').onclick=e=>{const n=e.target.dataset.n;if(n)openDrawer(inst.find(i=>i.name===n))};
+
+// Tabelle
+function drawRows(){
+  const v=visible();$('#cnt').textContent=v.length+' Instanzen';
+  $('#rows').innerHTML=v.map((i,k)=>`<tr data-k="${inst.indexOf(i)}"><td><span class="st" style="color:${color(i.cpu)}"><span class="dot"></span>${label(i.cpu)}</span></td><td>${i.name}</td><td>${i.region}</td><td>${i.type}</td>
+  <td><div class="bar"><i style="width:${i.cpu}%;background:${color(i.cpu)}"></i></div></td><td><div class="bar"><i style="width:${i.mem}%;background:${color(i.mem)}"></i></div></td><td>${i.net.toFixed(0)} Mbit/s</td></tr>`).join('');
+}
+$('#rows').onclick=e=>{const tr=e.target.closest('tr');if(tr)openDrawer(inst[tr.dataset.k])};
+const drawer=$('#drawer');
+function openDrawer(i){$('#dbody').innerHTML=`<h3>${i.name}</h3><div style="color:var(--muted);margin-bottom:16px">${i.type} · ${i.region}</div>
+  ${[['CPU',i.cpu,'%'],['Speicher',i.mem,'%'],['Netzwerk',i.net/10,'']].map(([l,v])=>`<div style="margin:12px 0"><div style="display:flex;justify-content:space-between"><span>${l}</span><b>${v.toFixed(1)} %</b></div><div class="bar" style="width:100%;height:8px"><i style="width:${v}%;background:${color(v)}"></i></div></div>`).join('')}
+  <h2 style="font-size:15px;font-weight:500;margin-top:24px">Letzte Ereignisse</h2>
+  <div class="alert"><span class="ms" style="color:var(--ok)">check_circle</span><div>Health-Check bestanden<div class="t">vor 12 s</div></div></div>
+  <div class="alert"><span class="ms" style="color:var(--primary)">autorenew</span><div>Autoscaler: 3 → 4 Replikas<div class="t">vor 6 min</div></div></div>`;drawer.classList.add('open')}
+
+// Alerts
+$('#alerts').innerHTML=[['error','crit','Hohe CPU auf gke-node-pool-b','asia-east1 · vor 2 min'],['warning','warn','Redis-Speicher bei 82 %','us-central1 · vor 9 min'],['warning','warn','p99-Latenz &gt; 220 ms','europe-west3 · vor 14 min'],['check_circle','ok','Spanner-Failover abgeschlossen','global · vor 1 h']]
+  .map(([i,c,t,m])=>`<div class="alert"><span class="ms" style="color:var(--${c})">${i}</span><div>${t}<div class="t">${m}</div></div></div>`).join('');
+
+// KPIs mit sanftem Hochzählen
+function count(el,to,fmt){const from=parseFloat(el.dataset.v||0),t0=performance.now();el.dataset.v=to;
+  (function f(t){const p=Math.min(1,(t-t0)/600),e=1-Math.pow(1-p,3);el.textContent=fmt(from+(to-from)*e);if(p<1)requestAnimationFrame(f)})(t0)}
+function drawKpi(){const v=visible(),cpu=v.reduce((s,i)=>s+i.cpu,0)/v.length;
+  count($('#k-cpu'),cpu,x=>x.toFixed(1)+' %');$('#k-cpu').style.color=color(cpu);$('#k-cpu-d').innerHTML=`<span style="color:${color(cpu)}">● ${label(cpu)}</span>`;
+  count($('#k-rps'),v.length*R(900,1100),x=>Math.round(x).toLocaleString('de-DE'));
+  count($('#k-lat'),R(140,240),x=>Math.round(x)+' ms')}
+
+function renderAll(){drawChart();drawTopo();drawHeat();drawRows();drawKpi()}
+renderAll();
+// Live-Simulation
+setInterval(()=>{series.cpu=[...series.cpu.slice(1),Math.max(5,Math.min(98,series.cpu.at(-1)+R(-3,3)))];series.mem=[...series.mem.slice(1),Math.max(20,Math.min(95,series.mem.at(-1)+R(-2,2)))];
+  inst.forEach(i=>{i.cpu=Math.max(3,Math.min(99,i.cpu+R(-5,5)));i.mem=Math.max(10,Math.min(97,i.mem+R(-2,2)))});drawChart();drawRows();drawKpi()},2000);
+setInterval(drawTopo,5000);
+</script>
+</body>
+</html>
